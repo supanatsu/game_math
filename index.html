@@ -4,310 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>High-Low Battle Number</title>
-    <style>
-        :root {
-            --color-bg: #1a1a24;
-            --color-panel: #2b2b36;
-            --color-text: #ffffff;
-            --color-p1: #4ea8de;
-            --color-p2: #f72585;
-            --color-btn: #ffd166;
-            --color-btn-hover: #ffb703;
-            --color-timer: #06d6a0;
-        }
-
-        body {
-            background-color: var(--color-bg);
-            color: var(--color-text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        h1 { margin-top: 0; letter-spacing: 2px; text-transform: uppercase; }
-
-        /* แถบเมนูด้านบน */
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        button.menu-btn {
-            background-color: var(--color-btn);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button.menu-btn:hover { background-color: var(--color-btn-hover); }
-        
-        button.menu-btn.disabled {
-            background-color: #555;
-            color: #999;
-            cursor: not-allowed;
-        }
-
-        /* ตัวจับเวลา */
-        #timer {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--color-timer);
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(6, 214, 160, 0.5);
-        }
-
-        /* พื้นที่สมรภูมิ (Battle Arena) */
-        .arena {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
-            max-width: 900px;
-        }
-
-        .player-panel {
-            flex: 1;
-            background-color: var(--color-panel);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-        }
-
-        .player-panel.p1 { border-top: 6px solid var(--color-p1); }
-        .player-panel.p2 { border-top: 6px solid var(--color-p2); }
-
-        .player-panel h2 { margin-top: 0; }
-        .p1 h2 { color: var(--color-p1); }
-        .p2 h2 { color: var(--color-p2); }
-
-        .input-group {
-            display: flex;
-            width: 100%;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        input[type="number"] {
-            flex: 1;
-            padding: 12px;
-            font-size: 1.2rem;
-            border: 2px solid #444;
-            border-radius: 6px;
-            background-color: #111;
-            color: white;
-            text-align: center;
-        }
-        
-        /* เอาลูกศรขึ้น-ลงของ input type number ออก */
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
-
-        button.guess-btn {
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            color: white;
-        }
-
-        .p1 button.guess-btn { background-color: var(--color-p1); }
-        .p2 button.guess-btn { background-color: var(--color-p2); }
-
-        /* ประวัติการทาย (Log) */
-        .log-container {
-            width: 100%;
-            height: 300px;
-            background-color: #111;
-            border-radius: 8px;
-            padding: 10px;
-            overflow-y: auto;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .log-item {
-            padding: 10px;
-            border-radius: 4px;
-            background-color: #222;
-            font-size: 1.1rem;
-            text-align: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .status-message {
-            margin-top: 20px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ffd166;
-            height: 35px;
-        }
-
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>High-Low Battle</h1>
-
-    <div class="controls">
-        <button class="menu-btn" onclick="initGame()">🔄 รีเซ็ตเกมใหม่</button>
-        <button class="menu-btn disabled" onclick="alert('โหมดสมการคณิตศาสตร์ และโหมดทายคำ จะอัปเดตในเวอร์ชันหน้านะครับ!')">🎮 เลือกโหมด (Coming Soon)</button>
-    </div>
-
-    <div id="timer">01:00</div>
-
-    <div class="arena">
-        <div class="player-panel p1">
-            <h2>Player 1</h2>
-            <div class="input-group">
-                <input type="number" id="p1-input" placeholder="ทายเลข..." autocomplete="off">
-                <button class="guess-btn" onclick="makeGuess(1)">ส่ง!</button>
-            </div>
-            <div class="log-container" id="p1-log"></div>
+    <header>
+        <h1>High-Low Battle</h1>
+        <div class="controls">
+            <button class="menu-btn" onclick="initGame()">🔄 เริ่มเกมใหม่</button>
+            <button class="menu-btn disabled" onclick="alert('โหมดสมการคณิตศาสตร์ จะอัปเดตในเร็วๆ นี้!')">🎮 เลือกโหมด</button>
         </div>
+    </header>
 
-        <div class="player-panel p2">
-            <h2>Player 2</h2>
-            <div class="input-group">
-                <input type="number" id="p2-input" placeholder="ทายเลข..." autocomplete="off">
-                <button class="guess-btn" onclick="makeGuess(2)">ส่ง!</button>
-            </div>
-            <div class="log-container" id="p2-log"></div>
-        </div>
-    </div>
-
-    <div id="status" class="status-message">กำลังรอเริ่มเกม...</div>
-
-    <script>
-        // ตั้งค่าตัวแปรหลัก
-        const MAX_NUMBER = 1000; // สุ่มเลขตั้งแต่ 1 ถึง 1000
-        const GAME_DURATION = 60; // เวลา 60 วินาที
+    <main>
+        <div id="timer" class="timer">01:00</div>
         
-        let targetNumber;
-        let timeLeft;
-        let timerInterval;
-        let isGameOver = false;
+        <div class="arena">
+            <div class="player-panel p1" id="panel-1">
+                <h2>Player 1</h2>
+                <div class="input-group">
+                    <input type="number" id="p1-input" placeholder="ทายเลข..." autocomplete="off">
+                    <button class="guess-btn" onclick="makeGuess(1)">ส่ง!</button>
+                </div>
+                <div class="log-container" id="p1-log"></div>
+            </div>
 
-        // ฟังก์ชันเริ่มต้น/รีเซ็ตเกม
-        function initGame() {
-            targetNumber = Math.floor(Math.random() * MAX_NUMBER) + 1;
-            timeLeft = GAME_DURATION;
-            isGameOver = false;
+            <div class="vs-badge">VS</div>
 
-            // ล้างหน้าจอและช่องกรอกข้อมูล
-            document.getElementById('p1-log').innerHTML = '';
-            document.getElementById('p2-log').innerHTML = '';
-            document.getElementById('p1-input').value = '';
-            document.getElementById('p2-input').value = '';
-            document.getElementById('p1-input').disabled = false;
-            document.getElementById('p2-input').disabled = false;
-            
-            document.getElementById('status').innerText = `ระบบสุ่มเลข 1 - ${MAX_NUMBER} ไว้แล้ว ลุยเลย!`;
-            updateTimerDisplay();
+            <div class="player-panel p2" id="panel-2">
+                <h2>Player 2</h2>
+                <div class="input-group">
+                    <input type="number" id="p2-input" placeholder="ทายเลข..." autocomplete="off">
+                    <button class="guess-btn" onclick="makeGuess(2)">ส่ง!</button>
+                </div>
+                <div class="log-container" id="p2-log"></div>
+            </div>
+        </div>
 
-            // จัดการ Timer
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-                
-                if (timeLeft <= 0) {
-                    endGame('หมดเวลา! ไม่มีใครตอบถูก ⌛', `เฉลยคือ ${targetNumber}`);
-                }
-            }, 1000);
-            
-            // Focus ที่ช่อง Player 1 ไว้ก่อน
-            document.getElementById('p1-input').focus();
-        }
+        <div id="status" class="status-message">กำลังรอเริ่มเกม...</div>
+    </main>
 
-        // แปลงวินาทีเป็นรูปแบบ MM:SS
-        function updateTimerDisplay() {
-            let minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-            document.getElementById('timer').innerText = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // ฟังก์ชันเมื่อกดส่งตัวเลข
-        function makeGuess(playerNum) {
-            if (isGameOver) return;
-
-            const inputField = document.getElementById(`p${playerNum}-input`);
-            const logContainer = document.getElementById(`p${playerNum}-log`);
-            const guess = parseInt(inputField.value);
-
-            if (isNaN(guess)) return;
-
-            let logMessage = "";
-            let logColor = "#222"; // ค่าเริ่มต้น (สีเทา)
-
-            // เช็คว่ามากกว่า น้อยกว่า หรือถูก
-            if (guess === targetNumber) {
-                logMessage = `🎉 ${guess} ถูกต้อง!`;
-                logColor = "#538d4e"; // สีเขียว
-                endGame(`🏆 Player ${playerNum} ชนะ!`, `ทายเลข ${targetNumber} ได้ถูกต้อง`);
-            } else if (guess < targetNumber) {
-                logMessage = `⬆️ ${guess} -> มากกว่านี้`;
-            } else {
-                logMessage = `⬇️ ${guess} -> น้อยกว่านี้`;
-            }
-
-            // สร้าง UI แสดงในกล่องประวัติ
-            const logItem = document.createElement('div');
-            logItem.className = 'log-item';
-            logItem.style.backgroundColor = logColor;
-            logItem.innerText = logMessage;
-            
-            // เอาข้อความใหม่ดันไว้ด้านบนเสมอ (Prepend)
-            logContainer.prepend(logItem);
-
-            // เคลียร์ช่อง input
-            inputField.value = '';
-        }
-
-        // จบเกมและแสดงผล
-        function endGame(mainStatus, subStatus) {
-            isGameOver = true;
-            clearInterval(timerInterval);
-            
-            document.getElementById('status').innerText = `${mainStatus} (${subStatus})`;
-            document.getElementById('p1-input').disabled = true;
-            document.getElementById('p2-input').disabled = true;
-        }
-
-        // อำนวยความสะดวก: กด Enter เพื่อส่งได้เลย
-        document.getElementById('p1-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') makeGuess(1);
-        });
-        document.getElementById('p2-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') makeGuess(2);
-        });
-
-        // รันเกมทันทีที่เปิดหน้าเว็บ
-        window.onload = initGame;
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
