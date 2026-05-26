@@ -2,29 +2,71 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>High-Low Battle Number</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>High-Low Battle Online</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <header>
         <h1>High-Low Battle</h1>
-        <div class="controls">
-            <button class="menu-btn" onclick="initGame()">🔄 เริ่มเกมใหม่</button>
-            <button class="menu-btn disabled" onclick="alert('โหมดสมการคณิตศาสตร์ จะอัปเดตในเร็วๆ นี้!')">🎮 เลือกโหมด</button>
-        </div>
+        <div class="subtitle">🔴 P2P MULTIPLAYER 🔴</div>
     </header>
 
-    <main>
-        <div id="timer" class="timer">01:00</div>
+    <div id="loading-screen" class="hidden">
+        กำลังเชื่อมต่อหากัน... 🔄
+    </div>
+
+    <div id="lobby-screen">
+        <div class="lobby-card">
+            <h2>🔥 สร้างห้องใหม่</h2>
+            <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">สร้างห้องและส่งรหัสให้เพื่อน</p>
+            <button class="btn" onclick="createRoom()">สร้างห้องเล่นเกม</button>
+        </div>
+        <div class="divider"></div>
+        <div class="lobby-card">
+            <h2>🎮 เข้าร่วมห้อง</h2>
+            <input type="number" id="join-code" class="text-input" placeholder="ใส่รหัสห้อง 4 หลัก">
+            <button class="btn" onclick="joinRoom()" style="background-color: var(--color-timer);">เข้าร่วมทันที</button>
+        </div>
+    </div>
+
+    <main id="game-screen" class="hidden">
+        <div class="game-info">
+            <div id="room-display" class="room-badge">Room: XXXX</div>
+            <div id="timer" class="timer">01:00</div>
+            <div id="status" class="status-message">กำลังรอเพื่อนเข้าร่วม...</div>
+            
+            <div class="range-tracker" id="range-tracker-container" style="display: none;">
+                <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px;">เรดาร์ค้นหาเป้าหมาย:</div>
+                <div class="range-labels">
+                    <span id="range-min">1</span>
+                    <span id="range-max">1000</span>
+                </div>
+                <div class="range-bar">
+                    <div class="range-fill" id="range-fill"></div>
+                </div>
+            </div>
+
+            <button id="leave-btn" class="btn hidden" style="margin-top: 15px; padding: 8px 15px; font-size: 0.9rem;" onclick="location.reload()">ออกสู่หน้าหลัก</button>
+        </div>
         
         <div class="arena">
             <div class="player-panel p1" id="panel-1">
-                <h2>Player 1</h2>
+                <span class="you-badge">YOU</span>
+                <div class="panel-header">
+                    <h2>Player 1</h2>
+                    <span class="turn-indicator">ตาของคุณ!</span>
+                </div>
+                <div class="emoji-bar">
+                    <button class="emoji-btn" onclick="sendEmoji('🤣')">🤣</button>
+                    <button class="emoji-btn" onclick="sendEmoji('👀')">👀</button>
+                    <button class="emoji-btn" onclick="sendEmoji('😡')">😡</button>
+                    <button class="emoji-btn" onclick="sendEmoji('🥶')">🥶</button>
+                    <button class="emoji-btn" onclick="sendEmoji('🔥')">🔥</button>
+                </div>
                 <div class="input-group">
-                    <input type="number" id="p1-input" placeholder="ทายเลข..." autocomplete="off">
-                    <button class="guess-btn" onclick="makeGuess(1)">ส่ง!</button>
+                    <input type="number" id="p1-input" placeholder="ทายเลข..." autocomplete="off" disabled>
+                    <button class="guess-btn" id="btn-1" onclick="makeGuess(1)" disabled>ส่ง!</button>
                 </div>
                 <div class="log-container" id="p1-log"></div>
             </div>
@@ -32,18 +74,31 @@
             <div class="vs-badge">VS</div>
 
             <div class="player-panel p2" id="panel-2">
-                <h2>Player 2</h2>
+                <span class="you-badge">YOU</span>
+                <div class="panel-header">
+                    <h2>Player 2</h2>
+                    <span class="turn-indicator">ตาของคุณ!</span>
+                </div>
+                <div class="emoji-bar">
+                    <button class="emoji-btn" onclick="sendEmoji('🤣')">🤣</button>
+                    <button class="emoji-btn" onclick="sendEmoji('👀')">👀</button>
+                    <button class="emoji-btn" onclick="sendEmoji('😡')">😡</button>
+                    <button class="emoji-btn" onclick="sendEmoji('🥶')">🥶</button>
+                    <button class="emoji-btn" onclick="sendEmoji('🔥')">🔥</button>
+                </div>
                 <div class="input-group">
-                    <input type="number" id="p2-input" placeholder="ทายเลข..." autocomplete="off">
-                    <button class="guess-btn" onclick="makeGuess(2)">ส่ง!</button>
+                    <input type="number" id="p2-input" placeholder="ทายเลข..." autocomplete="off" disabled>
+                    <button class="guess-btn" id="btn-2" onclick="makeGuess(2)" disabled>ส่ง!</button>
                 </div>
                 <div class="log-container" id="p2-log"></div>
             </div>
         </div>
-
-        <div id="status" class="status-message">กำลังรอเริ่มเกม...</div>
     </main>
 
+    <div id="toast">แจ้งเตือน</div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
