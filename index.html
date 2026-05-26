@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>High-Low Battle: The Ultimate Mind Games</title>
     <link rel="stylesheet" href="style.css">
+    <!-- นำเข้า PeerJS สำหรับโหมดเล่นกับเพื่อน -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 </head>
 <body>
     <button id="mute-btn" onclick="toggleMute()" title="เปิด/ปิดเสียง">🔊</button>
@@ -26,40 +28,115 @@
         </div>
 
         <div class="lobby-grid">
+            <!-- โหมดเล่นคนเดียว ปรับระดับความยากและเวลาจำกัดตามสั่ง -->
             <div class="lobby-card solo-card">
                 <h2>🤖 เล่นคนเดียว (VS AI)</h2>
-                <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">ดวลจิตวิทยากับ AlphaBot</p>
-                <button class="btn btn-blue" onclick="startSinglePlayer()">ปะทะ AI ทันที</button>
+                <div style="margin: 10px 0;">
+                    <select id="ai-difficulty" class="text-input" style="font-size: 1rem; padding: 10px;">
+                        <option value="easy">ความยาก: ง่าย (สุ่มเดา)</option>
+                        <option value="normal" selected>ความยาก: ปานกลาง (มีหลักการ)</option>
+                        <option value="hard">ความยาก: โหด (คิดแบบ AI)</option>
+                    </select>
+                </div>
+                <p style="margin: 0 0 10px 0; color: #94a3b8; font-size: 0.9rem;">(เวลาจำกัด 30 วินาที / ตัวเลขสูงสุด 10,000)</p>
+                <button class="btn btn-blue" onclick="startSinglePlayer(false)">ปะทะ AI ทันที</button>
+                
+                <hr style="border-color: rgba(255,255,255,0.1); width: 100%; margin: 15px 0;">
+                
+                <h2 style="color: #facc15;">⏱️ โหมดตะลุยด่าน (Time Attack)</h2>
+                <p style="margin: 0 0 10px 0; color: #94a3b8; font-size: 0.9rem;">เวลา 30 วิ / AI เก่งขึ้นตามด่าน! (สูงสุด 10,000)</p>
+                <button class="btn" style="background: linear-gradient(135deg, #a855f7, #ec4899);" onclick="startSinglePlayer(true)">เริ่มตะลุยด่าน!</button>
             </div>
 
             <div class="lobby-card">
                 <h2>🏠 สร้างห้อง (Host)</h2>
+                <p style="margin: 0 0 10px 0; color: #94a3b8; font-size: 0.9rem;">เวลาด่านปกติ 1 นาที (60 วินาที)</p>
                 <button class="btn" onclick="createRoom()">สร้างห้อง P2P</button>
             </div>
             
             <div class="lobby-card">
                 <h2>🔗 เข้าร่วมห้องเพื่อน</h2>
-                <input type="number" id="join-code" class="text-input" placeholder="รหัส 4 หลัก" autocomplete="off" style="margin-bottom: 10px;">
+                <input type="number" id="join-code" class="text-input tabular-nums" placeholder="รหัส 4 หลัก" autocomplete="off" style="margin-bottom: 10px;">
                 <button class="btn" onclick="joinRoom()" style="background-color: var(--color-timer);">เข้าร่วม</button>
             </div>
+
+            <!-- [เพิ่มใหม่] ปุ่มเปิดคู่มือการสอนเล่น และ Pop-up กติกาการเล่น -->
+            <button class="btn btn-tutorial" onclick="openTutorial()" style="background: linear-gradient(135deg, #06b6d4, #0891b2); box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4); margin-top: 5px;">📖 วิธีการเล่น &amp; กติกาการเล่น</button>
         </div>
     </div>
 
+    <!-- [เพิ่มใหม่] ป๊อปอัพหน้าต่างสอนเล่นและกติกา (Tutorial Pop-up Overlay) -->
+    <div id="tutorial-overlay" class="overlay hidden">
+        <div class="overlay-content tutorial-content">
+            <h2 style="background: linear-gradient(45deg, #a855f7, #f43f5e); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; margin-top: 0; font-size: 1.5rem; font-weight: 800; text-align: center;">📖 คู่มือการสอนเล่น &amp; กติกาเกม</h2>
+            
+            <div class="tutorial-tabs">
+                <button id="tab-btn-rules" class="tab-btn active" onclick="switchTutorialTab('rules')">กติกาพื้นฐาน</button>
+                <button id="tab-btn-skills" class="tab-btn" onclick="switchTutorialTab('skills')">ระบบสกิลพิเศษ</button>
+                <button id="tab-btn-mechanics" class="tab-btn" onclick="switchTutorialTab('mechanics')">ความร้อน &amp; คอมโบ</button>
+            </div>
+
+            <div id="tab-rules" class="tab-panel">
+                <ul class="tutorial-list">
+                    <li><strong>🎯 เป้าหมายเกม:</strong> ถอดรหัสหา <strong>"ตัวเลขความลับ" (ขอบเขต 1 - 10000)</strong> ของฝ่ายตรงข้ามให้เจอเป็นคนแรก!</li>
+                    <li><strong>🤫 การตั้งเลขลับ:</strong> เมื่อเริ่มเกมในแต่ละรอบ ทั้งคุณและคู่ต่อสู้จะต้องทำการแอบตั้งตัวเลขเป้าหมายของฝั่งตัวเองไว้</li>
+                    <li><strong>🔄 ผลัดกันเดา:</strong> ระบบจะทำการสลับเทิร์นให้ผู้เล่นพิมพ์ส่งตัวเลขเพื่อเดาเป้าหมาย</li>
+                    <li><strong>📊 เรดาร์วิเคราะห์:</strong> ทุกการทาย ระบบจะบอกว่าเลขจริงนั้น <strong>สูงกว่า (UP) ⬆️</strong> หรือ <strong>ต่ำกว่า (DOWN) ⬇️</strong> และจะบีบแถบเรดาร์ขอบเขตสีให้แคบลงทันทีเพื่อช่วยนำทางในการเดารอบถัดไป</li>
+                    <li><strong>⏳ ข้อจำกัดเวลาเดือด:</strong> 
+                        <ul>
+                            <li>โหมดเล่นคนเดียว (VS AI) และตะลุยด่าน มีเวลาจำกัดเพียง <strong>30 วินาที</strong> เท่านั้น!</li>
+                            <li>โหมดเล่นกับเพื่อนปกติ (P2P) มีเวลาให้รอบละ <strong>1 นาที (60 วินาที)</strong></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="tab-skills" class="tab-panel hidden">
+                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 15px; text-align: center;">💡 สกิลพิเศษทั้ง 4 ชนิด สามารถกดใช้ได้เพียง <strong>อย่างละ 1 ครั้งต่อรอบ</strong> เท่านั้น!</p>
+                <div class="skill-intro">
+                    <p><strong>🧊 Freeze (แช่แข็ง):</strong> บังคับข้ามเทิร์นถัดไปของฝ่ายตรงข้ามทันที ทำให้คุณได้สิทธิ์กดทายตัวเลขเบิ้ลเพิ่มอีกหนึ่งรอบฟรีๆ</p>
+                    <p><strong>📡 Scan (สแกนเรดาร์):</strong> บีบขอบเขตการคำนวณตัวเลขของคุณให้แคบลงอย่างปลอดภัย 20% โดยระบบจะช่วยตัดช่วงตัวเลขที่ผิดทิ้งให้ทันที</p>
+                    <p><strong>🥷 Stealth (ล่องหน):</strong> ซ่อนข้อมูลการเดาและระดับความร้อนในเทิร์นถัดไปของคุณ เพื่อป้องกันไม่ให้คู่แข่งแอบวิเคราะห์จับทางตัวเลขจากระยะห่างของเราได้</p>
+                    <p><strong>🌫️ Fake (หลอกลวง):</strong> ปล่อยข้อมูลประวัติการทายและผลลัพธ์ปลอมเข้าไปก่อความวุ่นวายบนหน้าจอของคู่ต่อสู้เพื่อทำให้ไขว้เขว</p>
+                </div>
+            </div>
+
+            <div id="tab-mechanics" class="tab-panel hidden">
+                <ul class="tutorial-list">
+                    <li><strong>🔥 เครื่องวัดระดับความร้อน (Distance Heat):</strong> ถ้ายิ่งทายตัวเลขใกล้เคียงเป้าหมายจริงมากเท่าไหร่ ระบบจะแสดงความร้อนแจ้งเตือนใน Log:
+                        <ul>
+                            <li><span style="color: var(--color-critical); font-weight: bold;">⚡ Critical (ห่างเพียง 1-3 แต้ม):</span> เข้าใกล้ขีดสุด! ได้รับเทิร์นพิเศษ (Extra Turn) ทายซ้ำได้อีกรอบทันทีโดยไม่ต้องสลับฝั่ง</li>
+                            <li><span style="color: #f97316; font-weight: bold;">💥 Boiling (ห่าง 4-15 แต้ม):</span> เดือดจัด ใกล้เคียงมากๆ</li>
+                            <li><span style="color: #eab308; font-weight: bold;">☀️ Hot (ห่าง 16-60 แต้ม):</span> ร้อนแรง เริ่มมาถูกทาง</li>
+                            <li><span style="color: #38bdf8; font-weight: bold;">❄️ Warm (ห่าง 61-200 แต้ม):</span> อุ่นๆ พอกล้อมแกล้ม</li>
+                            <li><span style="color: #94a3b8; font-weight: bold;">🧊 Cold (ห่างมากกว่า 200 แต้มขึ้นไป):</span> หนาวเหน็บ ห่างไกลความจริง</li>
+                        </ul>
+                    </li>
+                    <li><strong>⚡ ระบบ Combo เพิ่มเวลา:</strong> ทายตัวเลขแม่นยำในระดับความร้อน Hot ขึ้นไปติดต่อกัน 2 ครั้ง จะเข้าสู่สถานะคอมโบและบวกเวลาโบนัสช่วยชีวิตเพิ่มให้ทันที +5 วินาทีบนหน้าปัด!</li>
+                </ul>
+            </div>
+
+            <button class="btn" onclick="closeTutorial()" style="margin-top: 20px; background: #27272a; border: 1px solid #3f3f46; box-shadow: none;">ปิดคู่มือ &amp; เข้าสู่สนามประลอง</button>
+        </div>
+    </div>
+
+    <!-- หน้าจอตั้งค่าความลับ -->
     <div id="secret-overlay" class="overlay hidden">
         <div class="overlay-content">
             <h1 style="color: var(--color-p1);">🤫 ตั้งตัวเลขความลับ!</h1>
-            <p>ตั้งตัวเลข 1 - 1000 เพื่อให้อีกฝ่ายทาย</p>
-            <input type="number" id="secret-input" class="text-input" placeholder="???" style="font-size: 2.5rem; letter-spacing: 5px; margin-bottom: 20px;">
+            <p>ตั้งตัวเลข 1 - 10000 เพื่อให้อีกฝ่ายทาย</p>
+            <input type="number" id="secret-input" class="text-input tabular-nums" placeholder="???" style="font-size: 2.5rem; letter-spacing: 5px; margin-bottom: 20px;">
             <button id="btn-submit-secret" class="btn" onclick="submitSecret()">ยืนยันความลับ</button>
             <div id="secret-wait" class="hidden" style="margin-top: 15px; font-weight: bold; color: var(--color-timer);">⏳ รอคู่ต่อสู้ตั้งตัวเลข...</div>
         </div>
     </div>
 
+    <!-- หน้าจอเกมหลัก -->
     <main id="game-screen" class="hidden">
         <div class="game-header-bar">
             <div id="room-display" class="room-badge">Mode: SOLO</div>
             <div class="match-score">
-                <span id="score-p1">0</span> : <span id="score-p2">0</span>
+                <span id="score-p1" class="tabular-nums">0</span> : <span id="score-p2" class="tabular-nums">0</span>
                 <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">(ใครได้ 3 แต้มก่อนชนะแมตช์)</div>
             </div>
             <button id="leave-btn" class="btn-small" onclick="location.reload()">ออกหน้าหลัก</button>
@@ -67,83 +144,85 @@
 
         <div class="game-info">
             <div id="round-display" class="round-badge">ROUND 1</div>
-            <div id="timer" class="timer">05:00</div>
+            <div id="timer" class="timer tabular-nums">00:30</div>
             <div id="status" class="status-message">กำลังเริ่มเกม...</div>
             
             <div class="range-tracker" id="range-tracker-container">
                 <div class="range-labels">
-                    <span id="range-min">1</span>
+                    <span id="range-min" class="tabular-nums">1</span>
                     <span style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">เรดาร์วิเคราะห์เป้าหมายของคุณ</span>
-                    <span id="range-max">1000</span>
+                    <span id="range-max" class="tabular-nums">10000</span>
                 </div>
                 <div class="range-bar">
                     <div class="range-fill" id="range-fill"></div>
                 </div>
             </div>
         </div>
-        
+
         <div class="arena">
+            <div class="vs-badge">VS</div>
+            <!-- Player 1 Panel -->
             <div class="player-panel p1" id="panel-1">
                 <div class="panel-header">
                     <h2 id="name-p1"><span id="avatar-1">😎</span> Player 1</h2>
-                    <span class="turn-indicator">ตาของคุณ!</span>
+                    <span class="turn-indicator" id="turn-ind-1">ตาของคุณ!</span>
                 </div>
                 <div class="powerup-bar" id="powerup-bar-1">
                     <button id="skill-freeze-1" class="skill-btn" onclick="usePowerUp('freeze', 1)">🧊 แช่แข็ง</button>
-                    <button id="skill-scan-1" class="skill-btn" onclick="usePowerUp('scan', 1)">👁️ สแกน</button>
+                    <button id="skill-scan-1" class="skill-btn" onclick="usePowerUp('scan', 1)">📡 สแกน</button>
                     <button id="skill-stealth-1" class="skill-btn" onclick="usePowerUp('stealth', 1)">🥷 ล่องหน</button>
-                    <button id="skill-fake-1" class="skill-btn" onclick="usePowerUp('fake', 1)">🌫️ ลวงตา</button>
+                    <button id="skill-fake-1" class="skill-btn" onclick="usePowerUp('fake', 1)">🌫️ หลอกลวง</button>
                 </div>
-                <div class="input-group">
-                    <input type="number" id="p1-input" placeholder="ทายเลข 1-1000" autocomplete="off" disabled>
-                    <button class="guess-btn" id="btn-1" onclick="makeGuess(1)" disabled>SEND</button>
+                <div class="guess-section" style="display:flex; gap:10px; margin-bottom: 10px;">
+                    <input type="number" id="p1-input" class="text-input tabular-nums" placeholder="ทาย 1-10000" autocomplete="off">
+                    <button class="btn btn-blue" id="btn-1" onclick="makeGuess(1)" style="width: auto;">SEND</button>
                 </div>
-                <div class="log-container" id="p1-log"></div>
+                <div class="log-container" id="p1-log" style="height: 150px; overflow-y: auto; background: #09090b; border-radius: 8px; padding: 10px; border: 1px solid #27272a;"></div>
             </div>
 
-            <div class="vs-badge">VS</div>
-
+            <!-- Player 2 Panel -->
             <div class="player-panel p2" id="panel-2">
                 <div class="panel-header">
-                    <h2 id="name-p2"><span id="avatar-2">😎</span> Player 2</h2>
-                    <span class="turn-indicator">ตาของคุณ!</span>
+                    <h2 id="name-p2"><span id="avatar-2">🤖</span> Player 2</h2>
+                    <span class="turn-indicator" id="turn-ind-2" style="display: none;">กำลังคิด...</span>
                 </div>
                 <div class="powerup-bar" id="powerup-bar-2">
-                    <button id="skill-freeze-2" class="skill-btn" onclick="usePowerUp('freeze', 2)">🧊 แช่แข็ง</button>
-                    <button id="skill-scan-2" class="skill-btn" onclick="usePowerUp('scan', 2)">👁️ สแกน</button>
-                    <button id="skill-stealth-2" class="skill-btn" onclick="usePowerUp('stealth', 2)">🥷 ล่องหน</button>
-                    <button id="skill-fake-2" class="skill-btn" onclick="usePowerUp('fake', 2)">🌫️ ลวงตา</button>
+                    <button id="skill-freeze-2" class="skill-btn" onclick="usePowerUp('freeze', 2)" disabled>🧊 แช่แข็ง</button>
+                    <button id="skill-scan-2" class="skill-btn" onclick="usePowerUp('scan', 2)" disabled>📡 สแกน</button>
+                    <button id="skill-stealth-2" class="skill-btn" onclick="usePowerUp('stealth', 2)" disabled>🥷 ล่องหน</button>
+                    <button id="skill-fake-2" class="skill-btn" onclick="usePowerUp('fake', 2)" disabled>🌫️ หลอกลวง</button>
                 </div>
-                <div class="input-group">
-                    <input type="text" id="p2-input" placeholder="ทายเลข 1-1000" autocomplete="off" disabled>
-                    <button class="guess-btn" id="btn-2" onclick="makeGuess(2)" disabled>SEND</button>
+                <div class="guess-section" style="display:flex; gap:10px; margin-bottom: 10px;">
+                    <input type="number" id="p2-input" class="text-input tabular-nums" placeholder="รอฝ่ายตรงข้าม..." autocomplete="off" disabled>
+                    <button class="btn" id="btn-2" onclick="makeGuess(2)" style="width: auto;" disabled>SEND</button>
                 </div>
-                <div class="log-container" id="p2-log"></div>
+                <div class="log-container" id="p2-log" style="height: 150px; overflow-y: auto; background: #09090b; border-radius: 8px; padding: 10px; border: 1px solid #27272a;"></div>
             </div>
         </div>
 
-        <div class="action-bar" id="action-bar">
-            <button class="emoji-btn" onclick="sendEmoji('🤣')">🤣</button>
-            <button class="emoji-btn" onclick="sendEmoji('🤫')">🤫</button>
-            <button class="emoji-btn" onclick="sendEmoji('🤯')">🤯</button>
-            <button class="chat-btn" onclick="sendEmoji('คิดช้าจัง เดายากล่ะสิ!')">💬 คิดช้าจัง!</button>
-            <button class="chat-btn" onclick="sendEmoji('ระวังโดนหลอกนะ!')">💬 ระวังโดนหลอก!</button>
-        </div>
-
-        <div id="round-overlay" class="overlay hidden">
-            <div class="overlay-content">
-                <h1 id="overlay-title">🏆 ROUND OVER!</h1>
-                <p id="overlay-desc">ความลับถูกเปิดเผย!</p>
-                <button id="next-round-btn" class="btn" onclick="requestNextRound()">ลุยต่อรอบถัดไป!</button>
-                <div id="ready-status" style="margin-top: 15px; color: var(--color-timer); font-weight: bold; display: none;">รอการเตรียมพร้อม...</div>
-            </div>
+        <!-- แถบส่งอิโมจิกวนประสาท ส่งสติกเกอร์ (คงความสามารถเดิมครบถ้วน) -->
+        <div class="action-bar" id="action-bar" style="display: flex; gap: 10px; margin-top: 20px; width: 100%; justify-content: center;">
+            <button class="emoji-btn" onclick="sendEmoji('🤣')" style="background: #18181b; border: 1px solid #27272a; color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 1.3rem;">🤣</button>
+            <button class="emoji-btn" onclick="sendEmoji('🤫')" style="background: #18181b; border: 1px solid #27272a; color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 1.3rem;">🤫</button>
+            <button class="emoji-btn" onclick="sendEmoji('🤯')" style="background: #18181b; border: 1px solid #27272a; color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 1.3rem;">🤯</button>
+            <button class="chat-btn" onclick="sendEmoji('คิดช้าจัง เดายากล่ะสิ!')" style="background: #18181b; border: 1px solid #27272a; color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: bold; color: var(--color-text);">💬 คิดช้าจัง!</button>
+            <button class="chat-btn" onclick="sendEmoji('ระวังโดนหลอกนะ!')" style="background: #18181b; border: 1px solid #27272a; color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: bold; color: var(--color-text);">💬 ระวังโดนหลอก!</button>
         </div>
     </main>
 
-    <div id="toast"></div>
-    <canvas id="confetti-canvas"></canvas>
+    <!-- หน้าจอจบรอบ -->
+    <div id="round-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <h1 id="overlay-title">🏆 ROUND OVER!</h1>
+            <p id="overlay-desc">ความลับถูกเปิดเผย!</p>
+            <button id="next-round-btn" class="btn" onclick="requestNextRound()">ลุยต่อรอบถัดไป!</button>
+            <div id="ready-status" style="margin-top: 15px; color: var(--color-timer); font-weight: bold; display: none;">รอการเตรียมพร้อม...</div>
+        </div>
+    </div>
 
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <div id="toast" class="toast"></div>
+    <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1500;"></canvas>
+
     <script src="script.js"></script>
 </body>
 </html>
