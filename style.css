@@ -10,6 +10,9 @@
     --color-danger: #ef4444;
     --color-freeze: #38bdf8;
     --color-scan: #a855f7;
+    --color-stealth: #334155;
+    --color-fake: #ec4899;
+    --color-critical: #facc15;
 }
 
 body { background-color: var(--color-bg); color: var(--color-text); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; position: relative; }
@@ -25,29 +28,30 @@ h1 {
     font-size: clamp(2rem, 5vw, 3rem); 
     text-transform: uppercase; 
     background: linear-gradient(45deg, #f59e0b, #ef4444); 
-    /* แก้ไขการใช้งานคลิปพื้นหลังตามมาตรฐาน */
-    -webkit-background-clip: text; 
     background-clip: text; 
-    -webkit-text-fill-color: transparent; 
+    -webkit-background-clip: text; 
     color: transparent; 
+    -webkit-text-fill-color: transparent; 
     filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.2)); 
 }
 .subtitle { color: #a1a1aa; font-size: 1rem; font-weight: bold; letter-spacing: 2px; }
 
-.btn { background: linear-gradient(135deg, var(--color-btn), #ea580c); color: #fff; border: none; padding: 14px 28px; font-size: 1.1rem; font-weight: bold; border-radius: 12px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3); width: 100%; text-transform: uppercase; letter-spacing: 1px; }
+.btn { background: linear-gradient(135deg, var(--color-btn), #ea580c); color: #fff; border: none; padding: 14px 28px; font-size: 1.1rem; font-weight: bold; border-radius: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3); width: 100%; text-transform: uppercase; }
 .btn:hover:not(:disabled) { transform: translateY(-3px) scale(1.02); box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5); }
 .btn:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+.btn-blue { background: linear-gradient(135deg, #0ea5e9, #2563eb); box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
 .btn-small { background: #27272a; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
 .btn-small:hover { background: var(--color-danger); }
 
 input.text-input { padding: 14px 20px; font-size: 1.2rem; border: 2px solid #27272a; border-radius: 12px; background-color: #18181b; color: white; text-align: center; width: 100%; box-sizing: border-box; transition: 0.3s; }
 input.text-input:focus { outline: none; border-color: var(--color-p1); box-shadow: 0 0 15px rgba(14, 165, 233, 0.3); }
 
-#lobby-screen { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 450px; padding: 20px; gap: 20px; z-index: 10; }
-.player-name-setup { width: 100%; display: flex; flex-direction: column; gap: 8px; font-weight: bold; color: #a1a1aa; margin-bottom: 10px; }
-.lobby-card { background: var(--color-panel); padding: 30px; border-radius: 24px; width: 100%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
-.lobby-card h2 { margin: 0; color: #fff; font-size: 1.5rem; }
-.divider { color: #52525b; font-weight: bold; font-size: 1.2rem; margin: 10px 0; }
+#lobby-screen { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 500px; padding: 20px; gap: 20px; z-index: 10; }
+.player-name-setup { width: 100%; display: flex; flex-direction: column; gap: 8px; font-weight: bold; color: #a1a1aa; margin-bottom: 10px; text-align: center; }
+.lobby-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; }
+.lobby-card { background: var(--color-panel); padding: 25px; border-radius: 20px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; }
+.solo-card { border: 2px solid #0ea5e9; background: rgba(14, 165, 233, 0.05); }
+.lobby-card h2 { margin: 0; color: #fff; font-size: 1.4rem; }
 
 #game-screen { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; padding: 0 15px 40px; box-sizing: border-box; z-index: 10; }
 .game-header-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #18181b; padding: 10px 20px; border-radius: 16px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.05); }
@@ -69,31 +73,34 @@ input.text-input:focus { outline: none; border-color: var(--color-p1); box-shado
 .arena { display: flex; flex-direction: row; width: 100%; position: relative; gap: 25px; }
 .vs-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #18181b; color: #fff; font-size: 1.2rem; font-weight: 900; padding: 15px; border-radius: 50%; border: 4px solid #27272a; z-index: 10; font-style: italic; }
 
-.player-panel { flex: 1; background-color: var(--color-panel); border-radius: 24px; padding: 25px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid transparent; opacity: 0.5; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.player-panel { flex: 1; background-color: var(--color-panel); border-radius: 24px; padding: 25px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid transparent; opacity: 0.5; transition: all 0.4s; }
 .player-panel.active-turn { opacity: 1; transform: translateY(-5px); }
 .player-panel.p1.active-turn { border-color: var(--color-p1); box-shadow: 0 10px 30px rgba(14, 165, 233, 0.2); }
 .player-panel.p2.active-turn { border-color: var(--color-p2); box-shadow: 0 10px 30px rgba(244, 63, 94, 0.2); }
 
-.powerup-bar { display: flex; gap: 10px; margin-bottom: 15px; justify-content: flex-start; width: 100%; }
-.skill-btn { flex: 1; background: #27272a; border: 1px solid #3f3f46; color: #fff; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+/* ปรับ Powerup Bar เป็น Grid เพื่อรองรับ 4 ปุ่ม */
+.powerup-bar { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px; width: 100%; }
+.skill-btn { background: #27272a; border: 1px solid #3f3f46; color: #fff; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
 .skill-btn:hover:not(:disabled) { transform: translateY(-2px); }
 #skill-freeze-1:hover:not(:disabled), #skill-freeze-2:hover:not(:disabled) { background: var(--color-freeze); color: #000; border-color: #0ea5e9; }
 #skill-scan-1:hover:not(:disabled), #skill-scan-2:hover:not(:disabled) { background: var(--color-scan); color: #fff; border-color: #c084fc; }
+#skill-stealth-1:hover:not(:disabled), #skill-stealth-2:hover:not(:disabled) { background: var(--color-stealth); border-color: #94a3b8; }
+#skill-fake-1:hover:not(:disabled), #skill-fake-2:hover:not(:disabled) { background: var(--color-fake); color: #fff; border-color: #f472b6; }
 .skill-btn:disabled { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; }
 
 .player-panel.frozen { animation: freezePulse 1.5s infinite ease-in-out; border: 3px dashed var(--color-freeze) !important; filter: hue-rotate(40deg); }
 @keyframes freezePulse { 0%, 100% { box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); } 50% { box-shadow: 0 0 25px rgba(56, 189, 248, 0.8); } }
 
 .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 15px; }
-.player-panel h2 { margin: 0; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; }
+.player-panel h2 { margin: 0; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
 .p1 h2 { color: var(--color-p1); } .p2 h2 { color: var(--color-p2); }
 .turn-indicator { font-size: 0.8rem; padding: 5px 12px; border-radius: 20px; background: #27272a; color: #71717a; font-weight: bold; opacity: 0; transition: 0.3s; }
 .active-turn .turn-indicator { opacity: 1; background: var(--color-timer); color: #000; animation: popIn 0.3s ease; }
 
 .input-group { display: flex; width: 100%; gap: 10px; margin-bottom: 20px; }
-input[type="number"] { flex: 1; padding: 15px; font-size: 1.5rem; border: 2px solid #27272a; border-radius: 12px; background-color: #09090b; color: white; text-align: center; font-weight: bold; font-family: monospace; transition: 0.2s; }
-input[type="number"]:focus { outline: none; }
-.p1 input[type="number"]:focus { border-color: var(--color-p1); } .p2 input[type="number"]:focus { border-color: var(--color-p2); }
+input[type="number"], input[type="text"] { flex: 1; padding: 15px; font-size: 1.5rem; border: 2px solid #27272a; border-radius: 12px; background-color: #09090b; color: white; text-align: center; font-weight: bold; font-family: monospace; transition: 0.2s; }
+input[type="number"]:focus, input[type="text"]:focus { outline: none; }
+.p1 input:focus { border-color: var(--color-p1); } .p2 input:focus { border-color: var(--color-p2); }
 button.guess-btn { padding: 0 25px; font-size: 1.2rem; font-weight: 900; border: none; border-radius: 12px; cursor: pointer; color: #000; transition: 0.2s; }
 button.guess-btn:disabled { background: #27272a !important; color: #71717a !important; cursor: not-allowed; }
 .p1 button.guess-btn { background-color: var(--color-p1); } .p2 button.guess-btn { background-color: var(--color-p2); }
@@ -101,15 +108,20 @@ button.guess-btn:disabled { background: #27272a !important; color: #71717a !impo
 .log-container { width: 100%; height: 260px; background-color: #09090b; border-radius: 12px; padding: 15px; overflow-y: auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; border: 1px solid #27272a; }
 .log-container::-webkit-scrollbar { width: 6px; } .log-container::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
 
-.log-item { padding: 12px 15px; border-radius: 10px; background-color: #18181b; font-size: 1.1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-left: 5px solid transparent; }
+.log-item { padding: 12px 15px; border-radius: 10px; background-color: #18181b; font-size: 1.1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.3s ease; border-left: 5px solid transparent; }
 .log-val { font-family: monospace; font-size: 1.3rem; }
 .log-msg { font-size: 0.95rem; }
 
+.log-item.critical { border-left-color: var(--color-critical); background: rgba(250, 204, 21, 0.15); color: #fef08a; box-shadow: 0 0 10px rgba(250, 204, 21, 0.3); animation: heartbeat 0.8s infinite; }
 .log-item.boiling { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1); color: #fca5a5; }
 .log-item.hot { border-left-color: #f59e0b; background: rgba(245, 158, 11, 0.1); color: #fde68a; }
 .log-item.warm { border-left-color: #eab308; background: rgba(234, 179, 8, 0.1); color: #fef08a; }
 .log-item.cold { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.1); color: #bfdbfe; }
 .log-item.correct { background-color: #10b981; border-left-color: #059669; color: #fff; text-align: center; justify-content: center; font-size: 1.3rem; }
+
+/* Styling for Fake/Stealth logs seen by the caster */
+.log-item.fake-log { filter: grayscale(50%); border-style: dashed; opacity: 0.7; }
+.log-item.stealth-log { border-left-color: var(--color-stealth); background: rgba(51, 65, 85, 0.3); color: #cbd5e1; }
 
 .action-bar { width: 100%; margin-top: 25px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; background: #18181b; padding: 15px; border-radius: 16px; border: 1px solid #27272a; }
 .emoji-btn, .chat-btn { background: #27272a; border: 1px solid #3f3f46; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 8px 15px; border-radius: 10px; transition: 0.2s; font-weight: bold; }
@@ -122,10 +134,12 @@ button.guess-btn:disabled { background: #27272a !important; color: #71717a !impo
 
 #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #fff; color: #000; padding: 12px 25px; border-radius: 30px; font-weight: bold; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 200; opacity: 0; font-size: 1.1rem; }
 #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.floating-text { position: fixed; font-size: 2.3rem; font-weight: 900; pointer-events: none; z-index: 150; animation: floatUp 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); text-align: center; }
+.floating-text { position: fixed; font-size: 2.3rem; font-weight: 900; pointer-events: none; z-index: 150; animation: floatUp 1.5s forwards; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); text-align: center; }
 #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; }
-.shake { animation: screenShake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+.shake { animation: screenShake 0.4s both; }
 .combo-fire { animation: fireGlow 1s infinite alternate; border: 2px solid var(--color-btn) !important; }
+
 @keyframes fireGlow { 0% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); } 100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.9); } }
 @keyframes screenShake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(3px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-5px, 0, 0); } 40%, 60% { transform: translate3d(5px, 0, 0); } }
 @keyframes floatUp { 0% { opacity: 0; transform: translateY(20px) scale(0.6); } 20% { opacity: 1; transform: translateY(0px) scale(1.1); } 100% { opacity: 0; transform: translateY(-90px) scale(1); } }
@@ -140,5 +154,5 @@ button.guess-btn:disabled { background: #27272a !important; color: #71717a !impo
     .arena { flex-direction: column; gap: 20px; }
     .vs-badge { top: 50%; transform: translate(-50%, -50%) rotate(90deg); padding: 8px; font-size: 0.9rem; }
     .log-container { height: 180px; }
-    input[type="number"] { font-size: 16px; }
+    input[type="number"], input[type="text"] { font-size: 16px; }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>High-Low Battle: Mind Games Edition</title>
+    <title>High-Low Battle: The Ultimate Mind Games</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,31 +11,37 @@
 
     <header>
         <h1>High-Low Battle</h1>
-        <div class="subtitle">🧠 MIND GAMES EDITION 🧠</div>
+        <div class="subtitle">🧠 THE ULTIMATE MIND GAMES 🧠</div>
     </header>
 
     <div id="loading-screen" class="hidden">
         <div class="spinner"></div>
-        <p id="loading-text">กำลังซิงค์สัญญาณ P2P...</p>
+        <p id="loading-text">กำลังประมวลผลระบบ...</p>
     </div>
 
     <div id="lobby-screen">
         <div class="player-name-setup">
-            <label for="player-name">👤 ตั้งชื่อชื่อโปรไฟล์ของคุณ (Nickname):</label>
-            <input type="text" id="player-name" class="text-input" placeholder="เช่น: MindReader" maxlength="12" autocomplete="off">
+            <label for="player-name">👤 ชื่อโปรไฟล์ของคุณ (Nickname):</label>
+            <input type="text" id="player-name" class="text-input" placeholder="เช่น: โคนัน" maxlength="12" autocomplete="off">
         </div>
 
-        <div class="lobby-card">
-            <h2>🏠 สร้างห้องใหม่ (Host)</h2>
-            <button class="btn" onclick="createRoom()">สร้างห้องเล่นเกม</button>
-        </div>
-        
-        <div class="divider">OR</div>
-        
-        <div class="lobby-card">
-            <h2>🔗 เข้าร่วมห้องเพื่อน (Client)</h2>
-            <input type="number" id="join-code" class="text-input" placeholder="ใส่รหัสห้อง 4 หลัก" autocomplete="off">
-            <button class="btn" onclick="joinRoom()" style="background-color: var(--color-timer);">เข้าร่วมทันที</button>
+        <div class="lobby-grid">
+            <div class="lobby-card solo-card">
+                <h2>🤖 เล่นคนเดียว (VS AI)</h2>
+                <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">ดวลจิตวิทยากับ AlphaBot</p>
+                <button class="btn btn-blue" onclick="startSinglePlayer()">ปะทะ AI ทันที</button>
+            </div>
+
+            <div class="lobby-card">
+                <h2>🏠 สร้างห้อง (Host)</h2>
+                <button class="btn" onclick="createRoom()">สร้างห้อง P2P</button>
+            </div>
+            
+            <div class="lobby-card">
+                <h2>🔗 เข้าร่วมห้องเพื่อน</h2>
+                <input type="number" id="join-code" class="text-input" placeholder="รหัส 4 หลัก" autocomplete="off" style="margin-bottom: 10px;">
+                <button class="btn" onclick="joinRoom()" style="background-color: var(--color-timer);">เข้าร่วม</button>
+            </div>
         </div>
     </div>
 
@@ -51,23 +57,23 @@
 
     <main id="game-screen" class="hidden">
         <div class="game-header-bar">
-            <div id="room-display" class="room-badge">Room: XXXX</div>
+            <div id="room-display" class="room-badge">Mode: SOLO</div>
             <div class="match-score">
                 <span id="score-p1">0</span> : <span id="score-p2">0</span>
                 <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">(ใครได้ 3 แต้มก่อนชนะแมตช์)</div>
             </div>
-            <button id="leave-btn" class="btn-small" onclick="location.reload()">ออกห้อง</button>
+            <button id="leave-btn" class="btn-small" onclick="location.reload()">ออกหน้าหลัก</button>
         </div>
 
         <div class="game-info">
             <div id="round-display" class="round-badge">ROUND 1</div>
             <div id="timer" class="timer">05:00</div>
-            <div id="status" class="status-message">กำลังเชื่อมต่อ...</div>
+            <div id="status" class="status-message">กำลังเริ่มเกม...</div>
             
             <div class="range-tracker" id="range-tracker-container">
                 <div class="range-labels">
                     <span id="range-min">1</span>
-                    <span style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">เรดาร์วิเคราะห์เลขเป้าหมายของอีกฝ่าย</span>
+                    <span style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">เรดาร์วิเคราะห์เป้าหมายของคุณ</span>
                     <span id="range-max">1000</span>
                 </div>
                 <div class="range-bar">
@@ -79,12 +85,14 @@
         <div class="arena">
             <div class="player-panel p1" id="panel-1">
                 <div class="panel-header">
-                    <h2 id="name-p1">Player 1</h2>
+                    <h2 id="name-p1"><span id="avatar-1">😎</span> Player 1</h2>
                     <span class="turn-indicator">ตาของคุณ!</span>
                 </div>
                 <div class="powerup-bar" id="powerup-bar-1">
-                    <button id="skill-freeze-1" class="skill-btn" onclick="usePowerUp('freeze', 1)">🧊 แช่แข็ง (1)</button>
-                    <button id="skill-scan-1" class="skill-btn" onclick="usePowerUp('scan', 1)">👁️ สแกน (1)</button>
+                    <button id="skill-freeze-1" class="skill-btn" onclick="usePowerUp('freeze', 1)">🧊 แช่แข็ง</button>
+                    <button id="skill-scan-1" class="skill-btn" onclick="usePowerUp('scan', 1)">👁️ สแกน</button>
+                    <button id="skill-stealth-1" class="skill-btn" onclick="usePowerUp('stealth', 1)">🥷 ล่องหน</button>
+                    <button id="skill-fake-1" class="skill-btn" onclick="usePowerUp('fake', 1)">🌫️ ลวงตา</button>
                 </div>
                 <div class="input-group">
                     <input type="number" id="p1-input" placeholder="ทายเลข 1-1000" autocomplete="off" disabled>
@@ -97,15 +105,17 @@
 
             <div class="player-panel p2" id="panel-2">
                 <div class="panel-header">
-                    <h2 id="name-p2">Player 2</h2>
+                    <h2 id="name-p2"><span id="avatar-2">😎</span> Player 2</h2>
                     <span class="turn-indicator">ตาของคุณ!</span>
                 </div>
                 <div class="powerup-bar" id="powerup-bar-2">
-                    <button id="skill-freeze-2" class="skill-btn" onclick="usePowerUp('freeze', 2)">🧊 แช่แข็ง (1)</button>
-                    <button id="skill-scan-2" class="skill-btn" onclick="usePowerUp('scan', 2)">👁️ สแกน (1)</button>
+                    <button id="skill-freeze-2" class="skill-btn" onclick="usePowerUp('freeze', 2)">🧊 แช่แข็ง</button>
+                    <button id="skill-scan-2" class="skill-btn" onclick="usePowerUp('scan', 2)">👁️ สแกน</button>
+                    <button id="skill-stealth-2" class="skill-btn" onclick="usePowerUp('stealth', 2)">🥷 ล่องหน</button>
+                    <button id="skill-fake-2" class="skill-btn" onclick="usePowerUp('fake', 2)">🌫️ ลวงตา</button>
                 </div>
                 <div class="input-group">
-                    <input type="number" id="p2-input" placeholder="ทายเลข 1-1000" autocomplete="off" disabled>
+                    <input type="text" id="p2-input" placeholder="ทายเลข 1-1000" autocomplete="off" disabled>
                     <button class="guess-btn" id="btn-2" onclick="makeGuess(2)" disabled>SEND</button>
                 </div>
                 <div class="log-container" id="p2-log"></div>
@@ -117,8 +127,7 @@
             <button class="emoji-btn" onclick="sendEmoji('🤫')">🤫</button>
             <button class="emoji-btn" onclick="sendEmoji('🤯')">🤯</button>
             <button class="chat-btn" onclick="sendEmoji('คิดช้าจัง เดายากล่ะสิ!')">💬 คิดช้าจัง!</button>
-            <button class="chat-btn" onclick="sendEmoji('ขอบคุณที่ใบ้ให้นะ!')">💬 หวานเจี๊ยบ</button>
-            <button class="chat-btn" onclick="sendEmoji('แกโดนหลอกแล้ว!')">💬 โดนหลอกแล้ว!</button>
+            <button class="chat-btn" onclick="sendEmoji('ระวังโดนหลอกนะ!')">💬 ระวังโดนหลอก!</button>
         </div>
 
         <div id="round-overlay" class="overlay hidden">
@@ -126,7 +135,7 @@
                 <h1 id="overlay-title">🏆 ROUND OVER!</h1>
                 <p id="overlay-desc">ความลับถูกเปิดเผย!</p>
                 <button id="next-round-btn" class="btn" onclick="requestNextRound()">ลุยต่อรอบถัดไป!</button>
-                <div id="ready-status" style="margin-top: 15px; color: var(--color-timer); font-weight: bold; display: none;">รออีกฝ่ายกดเตรียมพร้อม...</div>
+                <div id="ready-status" style="margin-top: 15px; color: var(--color-timer); font-weight: bold; display: none;">รอการเตรียมพร้อม...</div>
             </div>
         </div>
     </main>
