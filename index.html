@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>High-Low Battle: The Ultimate Mind Games</title>
     <link rel="stylesheet" href="style.css">
-    <!-- นำเข้า PeerJS สำหรับโหมดเล่นกับเพื่อน -->
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 </head>
 <body>
@@ -28,7 +27,6 @@
         </div>
 
         <div class="lobby-grid">
-            <!-- โหมดเล่นคนเดียว ปรับระดับความยากและเวลาจำกัดตามสั่ง -->
             <div class="lobby-card solo-card">
                 <h2>🤖 เล่นคนเดียว (VS AI)</h2>
                 <div style="margin: 10px 0;">
@@ -60,12 +58,10 @@
                 <button class="btn" onclick="joinRoom()" style="background-color: var(--color-timer);">เข้าร่วม</button>
             </div>
 
-            <!-- [เพิ่มใหม่] ปุ่มเปิดคู่มือการสอนเล่น และ Pop-up กติกาการเล่น -->
             <button class="btn btn-tutorial" onclick="openTutorial()" style="background: linear-gradient(135deg, #06b6d4, #0891b2); box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4); margin-top: 5px;">📖 วิธีการเล่น &amp; กติกาการเล่น</button>
         </div>
     </div>
 
-    <!-- [เพิ่มใหม่] ป๊อปอัพหน้าต่างสอนเล่นและกติกา (Tutorial Pop-up Overlay) -->
     <div id="tutorial-overlay" class="overlay hidden">
         <div class="overlay-content tutorial-content">
             <h2 style="background: linear-gradient(45deg, #a855f7, #f43f5e); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; margin-top: 0; font-size: 1.5rem; font-weight: 800; text-align: center;">📖 คู่มือการสอนเล่น &amp; กติกาเกม</h2>
@@ -120,7 +116,17 @@
         </div>
     </div>
 
-    <!-- หน้าจอตั้งค่าความลับ -->
+    <div id="confirm-overlay" class="overlay hidden" style="z-index: 2000;">
+        <div class="overlay-content" style="max-width: 400px; padding: 30px;">
+            <h2 id="confirm-title" style="margin-top: 0;">ยืนยัน?</h2>
+            <p id="confirm-desc" style="color: #a1a1aa;">คุณแน่ใจหรือไม่ที่จะทำรายการนี้?</p>
+            <div style="display:flex; gap: 15px; justify-content: center; margin-top: 25px;">
+                <button class="btn" style="background: #3f3f46; box-shadow: none;" onclick="closeConfirm()">ยกเลิก</button>
+                <button class="btn" id="confirm-yes-btn" style="background: var(--color-danger);">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+
     <div id="secret-overlay" class="overlay hidden">
         <div class="overlay-content">
             <h1 style="color: var(--color-p1);">🤫 ตั้งตัวเลขความลับ!</h1>
@@ -131,7 +137,6 @@
         </div>
     </div>
 
-    <!-- หน้าจอเกมหลัก -->
     <main id="game-screen" class="hidden">
         <div class="game-header-bar">
             <div id="room-display" class="room-badge">Mode: SOLO</div>
@@ -139,7 +144,10 @@
                 <span id="score-p1" class="tabular-nums">0</span> : <span id="score-p2" class="tabular-nums">0</span>
                 <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">(ใครได้ 3 แต้มก่อนชนะแมตช์)</div>
             </div>
-            <button id="leave-btn" class="btn-small" onclick="location.reload()">ออกหน้าหลัก</button>
+            <div style="display: flex; gap: 8px;">
+                <button id="surrender-btn" class="btn-small" style="background: var(--color-danger);" onclick="confirmSurrender()">🏳️ ยอมแพ้</button>
+                <button id="leave-btn" class="btn-small" onclick="confirmLeave()">🏠 ออก</button>
+            </div>
         </div>
 
         <div class="game-info">
@@ -161,7 +169,6 @@
 
         <div class="arena">
             <div class="vs-badge">VS</div>
-            <!-- Player 1 Panel -->
             <div class="player-panel p1" id="panel-1">
                 <div class="panel-header">
                     <h2 id="name-p1"><span id="avatar-1">😎</span> Player 1</h2>
@@ -180,7 +187,6 @@
                 <div class="log-container" id="p1-log" style="height: 150px; overflow-y: auto; background: #09090b; border-radius: 8px; padding: 10px; border: 1px solid #27272a;"></div>
             </div>
 
-            <!-- Player 2 Panel -->
             <div class="player-panel p2" id="panel-2">
                 <div class="panel-header">
                     <h2 id="name-p2"><span id="avatar-2">🤖</span> Player 2</h2>
@@ -200,7 +206,6 @@
             </div>
         </div>
 
-        <!-- แถบส่งอิโมจิกวนประสาท ส่งสติกเกอร์ (คงความสามารถเดิมครบถ้วน) -->
         <div class="action-bar" id="action-bar" style="display: flex; gap: 10px; margin-top: 20px; width: 100%; justify-content: center;">
             <button class="emoji-btn" onclick="sendEmoji('🤣')" style="background: #18181b; border: 1px solid #27272a; color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 1.3rem;">🤣</button>
             <button class="emoji-btn" onclick="sendEmoji('🤫')" style="background: #18181b; border: 1px solid #27272a; color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 1.3rem;">🤫</button>
@@ -210,13 +215,22 @@
         </div>
     </main>
 
-    <!-- หน้าจอจบรอบ -->
     <div id="round-overlay" class="overlay hidden">
         <div class="overlay-content">
             <h1 id="overlay-title">🏆 ROUND OVER!</h1>
             <p id="overlay-desc">ความลับถูกเปิดเผย!</p>
-            <button id="next-round-btn" class="btn" onclick="requestNextRound()">ลุยต่อรอบถัดไป!</button>
-            <div id="ready-status" style="margin-top: 15px; color: var(--color-timer); font-weight: bold; display: none;">รอการเตรียมพร้อม...</div>
+            
+            <div id="round-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button id="next-round-btn" class="btn btn-blue" onclick="requestNextRound()">🔄 เล่นรอบถัดไป!</button>
+                <button class="btn" style="background: #3f3f46;" onclick="location.reload()">🛌 พักก่อน (ออก)</button>
+            </div>
+            
+            <div id="match-over-controls" class="hidden" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button id="rematch-btn" class="btn btn-blue" onclick="requestRematch()">🔄 เล่นต่อ (รีแมตช์)</button>
+                <button class="btn" style="background: #3f3f46;" onclick="location.reload()">🛌 พัก (กลับหน้าหลัก)</button>
+            </div>
+
+            <div id="ready-status" style="margin-top: 15px; color: var(--color-timer); font-weight: bold; display: none;">รอการยืนยันจากอีกฝ่าย...</div>
         </div>
     </div>
 

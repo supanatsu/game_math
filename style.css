@@ -18,11 +18,8 @@
 body { background-color: var(--color-bg); color: var(--color-text); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; position: relative; }
 .hidden { display: none !important; }
 
-/* === 🔒 ป้องกันฟอนต์เลื่อนขยับและตัวเลขกระตุกเลย์เอาต์ (Tabular Nums Monospace) === */
-.tabular-nums {
-    font-variant-numeric: tabular-nums;
-    font-family: 'Courier New', Courier, monospace !important;
-}
+/* === 🔒 ป้องกันฟอนต์เลื่อนขยับและตัวเลขกระตุกเลย์เอาต์ === */
+.tabular-nums { font-variant-numeric: tabular-nums; font-family: 'Courier New', Courier, monospace !important; }
 #range-min { display: inline-block; min-width: 65px; text-align: left; }
 #range-max { display: inline-block; min-width: 65px; text-align: right; }
 .timer, .match-score, .range-labels { font-variant-numeric: tabular-nums; }
@@ -40,7 +37,7 @@ h1 { margin: 0 0 5px 0; letter-spacing: 3px; font-size: clamp(2rem, 5vw, 3rem); 
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 .btn-blue { background: linear-gradient(135deg, #0ea5e9, #2563eb); box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
 .btn-small { background: #27272a; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-.btn-small:hover { background: var(--color-danger); }
+.btn-small:hover { background: #3f3f46; transform: translateY(-2px); }
 
 input.text-input, select.text-input { padding: 14px 20px; font-size: 1.2rem; border: 2px solid #27272a; border-radius: 12px; background-color: #18181b; color: white; text-align: center; width: 100%; box-sizing: border-box; transition: 0.3s; }
 input.text-input:focus, select.text-input:focus { outline: none; border-color: var(--color-p1); box-shadow: 0 0 15px rgba(14, 165, 233, 0.3); }
@@ -85,9 +82,8 @@ input.text-input:focus, select.text-input:focus { outline: none; border-color: v
 .powerup-bar { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px; width: 100%; }
 .skill-btn { background: #27272a; border: 1px solid #3f3f46; color: #fff; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
 .skill-btn:hover:not(:disabled) { transform: translateY(-2px); }
-.skill-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.skill-btn:disabled { opacity: 0.3; cursor: not-allowed; text-decoration: line-through; }
 
-/* === 📖 [เพิ่มใหม่] สไตล์ของ Pop-up สอนเล่นและกติกาการใช้งาน === */
 .tutorial-content { max-width: 600px !important; width: 95%; text-align: left !important; display: flex; flex-direction: column; max-height: 85vh; }
 .tutorial-tabs { display: flex; gap: 10px; border-bottom: 2px solid #27272a; padding-bottom: 10px; margin-bottom: 15px; width: 100%; }
 .tab-btn { background: #18181b; border: 1px solid #27272a; color: #a1a1aa; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; flex: 1; text-align: center; }
